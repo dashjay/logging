@@ -17,6 +17,7 @@ const (
 	colorYellow
 	colorBlue
 	colorMagenta // 洋红
+	colorCyan
 )
 
 var (
@@ -27,7 +28,7 @@ var (
 
 	logger     *log.Logger
 	logPrefix  = ""
-	levelFlags = []string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
+	levelFlags = []string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC"}
 
 	levelColors = []func(test string) string{
 		func(s string) string {
@@ -45,6 +46,9 @@ var (
 		func(s string) string {
 			return fmt.Sprintf("\x1b[%dm%s\x1b[0m", colorMagenta, s)
 		},
+		func(s string) string {
+			return fmt.Sprintf("\x1b[%dm%s\x1b[0m", colorCyan, s)
+		},
 	}
 )
 
@@ -54,6 +58,7 @@ const (
 	WARNING
 	ERROR
 	FATAL
+	PANIC
 )
 
 // Setup initialize the log instance
@@ -82,6 +87,7 @@ func SetOutputFilename(filename string) error {
 	return nil
 }
 
+// SetFlags 修改flag
 func SetFlags(flag int) {
 	logger.SetFlags(flag)
 }
@@ -116,34 +122,46 @@ func Fatal(v ...interface{}) {
 	logger.Fatalln(v...)
 }
 
-// Debug output logs at debug level
+// Panic output logs at fatal level
+func Panic(v ...interface{}) {
+	setPrefix(PANIC)
+	logger.Panic(v...)
+}
+
+// Debugf output logs at debug level
 func Debugf(s string, v ...interface{}) {
 	setPrefix(DEBUG)
 	logger.Println(fmt.Sprintf(s, v...))
 }
 
-// Info output logs at info level
+// Infof output logs at info level
 func Infof(s string, v ...interface{}) {
 	setPrefix(INFO)
 	logger.Println(fmt.Sprintf(s, v...))
 }
 
-// Warn output logs at warn level
+// Warnf output logs at warn level
 func Warnf(s string, v ...interface{}) {
 	setPrefix(WARNING)
 	logger.Println(fmt.Sprintf(s, v...))
 }
 
-// Error output logs at error level
+// Errorf output logs at error level
 func Errorf(s string, v ...interface{}) {
 	setPrefix(ERROR)
 	logger.Println(fmt.Sprintf(s, v...))
 }
 
-// Fatal output logs at fatal level
+// Fatalf output logs at fatal level
 func Fatalf(s string, v ...interface{}) {
 	setPrefix(FATAL)
 	logger.Fatalf(fmt.Sprintf(s, v...))
+}
+
+// Panicf output logs at fatal level
+func Panicf(s string, v ...interface{}) {
+	setPrefix(PANIC)
+	logger.Panicf(s, v...)
 }
 
 // setPrefix set the prefix of the log output
